@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<title>Attendance for {{ date }}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<div id="page-header">
+    <h1>Attendance for {{ date }}</h1>
+</div>
+<form method="POST">
+        <table>
+            <tr>
+                {% for i in range(table_size) %}
+                <td>Name</td> 
+                <td>Present</td>
+                {% endfor %}
+            </tr>
+        {% for name, presense in student_data.items() %}
+            {% set index = loop.index0 %}
+            {% if loop.index0 % table_size == 0 %}
+            <tr>
+            {% endif %}
+                <td class="{{ loop.cycle('table-light', 'table-dark') }}">{{ name }}</td>
+                <td class="{{ loop.cycle('table-light', 'table-dark') }}">
+                    <input name='present' type="checkbox" value="{{ name }}" {{ "checked" if presense }}>
+                </td>
+            {% if loop.index0 == index + 6 %}
+            </tr>
+            {% endif %}
+        {% endfor %}
+        </table>
+    <input class="btn" type="submit" value="Submit" />
+</form>

@@ -1,0 +1,29 @@
+* {
+	box-sizing: border-box;
+}
+body {
+	margin: 0;
+	padding: 0;
+}
+form {
+	text-align: center;
+}
+table {
+	width: 100%	;
+	text-align: left;
+	border: 2px #000 solid;
+}
+td {
+	margin: 5px;
+}
+.btn {
+	margin: 5px;
+	font-size: 20px;
+	width: 20%;
+}
+.table-light {
+	background: #ccc;
+}
+.table-dark {
+	background: #999;
+}

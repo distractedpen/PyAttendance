@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<title>Attendance Grid</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<div id="page-header">
+    <h1>Attendance Grid</h1>
+</div>
+<table>
+    <tr>
+        {% for date in dates %} 
+        <td>{{ date }}</td>
+        {% endfor %}
+    </tr>
+{% for name, attendance in attendance_data %}
+    <tr>
+        <td class="{{ loop.cycle('table-light', 'table-dark') }}">{{ name }}</td>
+        {% for presense in attendance %}
+        <td class="{{ loop.cycle('table-dark', 'table-light') }}">{{ "X" if not presense }}</td>
+        {% endfor %}
+    </tr>
+{% endfor %}
+</table>
