@@ -31,7 +31,7 @@ attendance_path = path.join(BASEPATH, ATTENDANCE_FILENAME)
 
 def get_accounts():
     """ Open the accounts.txt file and return a list of student names and accounts """
-    with open("accounts.txt", 'r', encoding='utf-8') as file_d:
+    with open(accounts_path, 'r', encoding='utf-8') as file_d:
         data = file_d.read().strip()
         accounts = data.split("\n")
         scrubbed_accounts = []
@@ -42,7 +42,7 @@ def get_accounts():
 
 def get_students():
     """ Open the students.txt file ang return a list of student names. """
-    with open("students.txt", 'r', encoding='utf-8') as file_d:
+    with open(students_path, 'r', encoding='utf-8') as file_d:
         data = file_d.read().strip()
         students = data.split("\n")
     return students
@@ -52,13 +52,13 @@ def load_attendance_data():
         If attendance.csv does not exist,
         create new attendance_data object using students.txt.
     """
-    if not path.exists("attendance.csv"):
+    if not path.exists(attendance_path):
         students = get_students()
         attendance_dict = {student:[] for student in students}
         header = ["name"]
         return attendance_dict, header
 
-    with open("attendance.csv", 'r', encoding='utf-8') as file_d:
+    with open(attendance_path, 'r', encoding='utf-8') as file_d:
         data = file_d.read().strip("\n")
         student_att_data = data.split("\n")
         header = student_att_data.pop(0).split(",") # name, dates...
@@ -78,7 +78,7 @@ def load_attendance_data():
 
 def save_attendance_data(attendance_data, header):
     """ Save attendance data to attendance.csv """
-    with open("attendance.csv", 'w', encoding='utf-8') as file_d:
+    with open(attendance_path, 'w', encoding='utf-8') as file_d:
         file_d.write(",".join(header) + "\n")
         for name in attendance_data:
             rec_presence = [str(entry) for entry in attendance_data[name]]
