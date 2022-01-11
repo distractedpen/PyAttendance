@@ -5,6 +5,20 @@ from flask import (
     Flask, render_template, redirect, request, url_for
 )
 
+###
+# Paths to each of the required files
+###
+BASEPATH = "../data/"
+CANVAS_FILENAME = "canvas.txt"
+STUDENTS_FILENAME = "students.txt"
+ACCOUNTS_FILENAME = "accounts.txt"
+ATTENDANCE_FILENAME = "attendance.csv"
+
+canvas_path = path.join(BASEPATH, CANVAS_FILENAME)
+students_path = path.join(BASEPATH, STUDENTS_FILENAME)
+accounts_path = path.join(BASEPATH, ACCOUNTS_FILENAME)
+attendance_path = path.join(BASEPATH, ATTENDANCE_FILENAME)
+
 
 # Additions
 # - Arrow Buttons to move to next/previous day
@@ -71,7 +85,7 @@ def save_attendance_data(attendance_data, header):
             rec = ",".join([name] + rec_presence)
             file_d.write(rec + "\n")
 
-def attendance_taken(date):
+def attendance_taken(given_date):
     """ Determine if attendance has be taken on date.
         Returns list of False if not.
         Returns list of True/False for Present/Absent
@@ -83,17 +97,14 @@ def attendance_taken(date):
         return [False]*len(attendence_data)
 
     presense = []
-    index = dates.index(date)
-    print(attendence_data)
-    print(dates)
-    print(index)
+    loc = dates.index(given_date)
     for name in attendence_data:
-        presense.append(attendence_data[name][index])
+        presense.append(attendence_data[name][loc])
     return presense
 
-def get_readable_date(date):
+def get_readable_date(given_date):
     """ Convert string date to readable format. """
-    year, month, day = date.split("-")
+    year, month, day = given_date.split("-")
     return f"{month}/{day}/{year}"
 
 ###
@@ -113,7 +124,7 @@ def index():
     return redirect(url_for('attendance', date=today))
 
 @app.route('/attendance/<date>', methods=("GET", "POST"))
-def attendance(date):
+def attendance(given_date):
     """ Displays Attendance Page for date.
         on HTML POST, attendance data is saved to attendance.csv
         on HTML GET, attendance data is loaded from attendance.csv
@@ -121,21 +132,22 @@ def attendance(date):
     """
     students = get_students()
 
-    readable_date = get_readable_date(date)
+    readable_date = get_readable_date(given_date)
 
     if request.method == "POST":
         todays_attendance = request.form.getlist("present")
         all_attendance_dict, header = load_attendance_data()
-        header.append(date)
+        header.append(given_date)
         for name in all_attendance_dict:
             all_attendance_dict[name].append(False)
         for name in todays_attendance:
             all_attendance_dict[name][-1] = True
         save_attendance_data(all_attendance_dict, header)
 
-    presense = attendance_taken(date)
+    presense = attendance_taken(given_date)
     student_data = {students[i]:presense[i] for i in range(len(students))}
-    return render_template("attendance.html", date=readable_date, student_data=student_data, table_size=5)
+    return render_template("attendance.html", date=readable_date,
+        student_data=student_data, table_size=5)
 
 
 @app.route('/attendance/grid')
@@ -143,7 +155,8 @@ def grid():
     """ Show the number of days present/missed by student in a grid """
     all_attendance_dict, header = load_attendance_data()
     print(all_attendance_dict)
-    return render_template("attendance-grid.html", dates=header, attendance_data=all_attendance_dict.items())
+    return render_template("attendance-grid.html", dates=header,
+        attendance_data=all_attendance_dict.items())
 
 
 @app.route("/attendance/<wanted_account>")
@@ -161,5 +174,5 @@ def attendance_by_account(wanted_account):
     if name is None:
         status_message = "No student associated with this account number."
         return render_template("error.html", status_message=status_message)
-    else:
-        return render_template("attendance-by-account.html", dates=header, attendence_data=all_attendance_dict[name])
+    return render_template("attendance-by-account.html", dates=header,
+        attendence_data=all_attendance_dict[name])
