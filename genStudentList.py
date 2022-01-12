@@ -10,7 +10,8 @@ if __name__ == "__main__":
         header = next(reader)
         for row in reader:
             if "151-001" in row[4] and row[0] != "Student, Test":
-                students.append(row[0])
+                first, last = row.strip().split(",")
+                students.append(f"{first} {last}")
     
     with open("students.txt", 'w') as fd:
         fd.write("\n".join(students))

@@ -123,7 +123,7 @@ def index():
     today = date.today().isoformat()
     return redirect(url_for('attendance', date=today))
 
-@app.route('/attendance/<date>', methods=("GET", "POST"))
+@app.route('/attendance/<given_date>', methods=("GET", "POST"))
 def attendance(given_date):
     """ Displays Attendance Page for date.
         on HTML POST, attendance data is saved to attendance.csv
