@@ -6,6 +6,8 @@
 </div>
 <table>
     <tr>
+        <td>Name</td>
+        <td>Points</td>
         {% for date in dates %} 
         <td>{{ date }}</td>
         {% endfor %}
@@ -13,8 +15,15 @@
 {% for name, attendance in attendance_data %}
     <tr>
         <td class="{{ loop.cycle('table-light', 'table-dark') }}">{{ name }}</td>
+        <td class="{{ loop.cycle('table-light', 'table-dark') }}">{{ points[name] }}/{{ totals[name] }}</td>
         {% for presense in attendance %}
-        <td class={{ "table-absent" if not presense }}>{{ "X" if not presense }}</td>
+        {% if presense == "-" %}
+        <td>-</td>
+        {% elif presense %}
+        <td></td>
+        {% else %}
+        <td class="table-absent" }}>X</td>
+        {% endif %}
         {% endfor %}
     </tr>
 {% endfor %}

@@ -9,7 +9,7 @@ from flask import (
 # Paths to each of the required files
 ###
 BASEPATH = "../data/"
-CANVAS_FILENAME = "canvas.txt"
+CANVAS_FILENAME = "canvas.csv"
 STUDENTS_FILENAME = "students.txt"
 ACCOUNTS_FILENAME = "accounts.txt"
 ATTENDANCE_FILENAME = "attendance.csv"
@@ -61,18 +61,22 @@ def load_attendance_data():
     with open(attendance_path, 'r', encoding='utf-8') as file_d:
         data = file_d.read().strip("\n")
         student_att_data = data.split("\n")
+        print(student_att_data)
         header = student_att_data.pop(0).split(",") # name, dates...
         attendance_dict = {}
         for str_data in student_att_data:
-            str_data_list = str_data.split(",")
+            str_data_list = str_data.strip().split(",")
             name = str_data_list[0]
             str_presense = str_data_list[1:]
             presence = []
             for entry in str_presense:
                 if entry == "True":
                     presence.append(True)
+                elif entry == "-":
+                    presence.append('-')
                 else:
                     presence.append(False)
+            print(name, str_presense, presence)
             attendance_dict[name] = presence
         return attendance_dict, header
 
@@ -121,7 +125,7 @@ app = Flask(__name__)
 def index():
     """ Get todays date and redirect to new attendance for today """
     today = date.today().isoformat()
-    return redirect(url_for('attendance', date=today))
+    return redirect(url_for('attendance', given_date=today))
 
 @app.route('/attendance/<given_date>', methods=("GET", "POST"))
 def attendance(given_date):
@@ -154,9 +158,12 @@ def attendance(given_date):
 def grid():
     """ Show the number of days present/missed by student in a grid """
     all_attendance_dict, header = load_attendance_data()
+    points = {i: sum([1 for i in all_attendance_dict[i] if i == True]) for i in all_attendance_dict.keys()}
+    totals = {i: sum([1 for i in all_attendance_dict[i] if i != "-"]) for i in all_attendance_dict.keys()}
     print(all_attendance_dict)
-    return render_template("attendance-grid.html", dates=header,
-        attendance_data=all_attendance_dict.items())
+    print(points)
+    return render_template("attendance-grid.html", dates=header[1:],
+        attendance_data=all_attendance_dict.items(), points=points, totals=totals)
 
 
 @app.route("/attendance/<wanted_account>")
